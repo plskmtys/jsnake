@@ -1,6 +1,7 @@
 package org.jsnake;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Fruit {
     private Point location;
@@ -8,6 +9,9 @@ public class Fruit {
 
     public Fruit() {
         // Randomly generate fruit location and type
+        Random random = new Random();
+        location = new Point(random.nextInt(40), random.nextInt(40));
+        type = random.nextInt(4) + 1;
     }
 
     public void draw(Graphics g) {

@@ -36,4 +36,10 @@ public class ScoreManager {
     public List<Integer> getScores() {
         return scores;
     }
+
+    public int resetScore() {
+        scores.clear();
+        saveScores();
+        return 0;
+    }
 }
