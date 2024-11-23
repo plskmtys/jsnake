@@ -21,26 +21,26 @@ import javax.swing.Timer;
 import java.awt.image.*;
 
 public class Board extends JPanel implements ActionListener {
-
+    
+    private enum Direction {
+        UP, DOWN, LEFT, RIGHT
+    }
+    
     private static final int B_WIDTH = 800;
     private static final int B_HEIGHT = 800;
-    private static final int DOT_SIZE = 20;
-    private static final int ALL_DOTS = 900;
+    private static final int SQUARE_SIZE = 20;
+    private static final int MAXLEN = 900;
     private static final int RAND_POS = 29;
-    private static final int DELAY = 140;
+    private static final int DELAY = 60;
 
-    private final int x[] = new int[ALL_DOTS];
-    private final int y[] = new int[ALL_DOTS];
+    private final int x[] = new int[MAXLEN];
+    private final int y[] = new int[MAXLEN];
 
-    private int dots;
+    private int length;
     private int appleX;
     private int appleY;
-
-    private boolean leftDirection = false;
-    private boolean rightDirection = true;
-    private boolean upDirection = false;
-    private boolean downDirection = false;
     private boolean inGame = true;
+    private Direction direction = Direction.RIGHT;
 
     private Timer timer;
     private Image ball;
@@ -65,19 +65,13 @@ public class Board extends JPanel implements ActionListener {
 
     private void loadImages() {
 
-        //ImageIcon iid = new ImageIcon("src/main/resources/dot.png");
-        //ball = iid.getImage();
-
         BufferedImage iid = null;
         try{
             iid = ImageIO.read(new File("src/main/resources/dot.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ball = iid.getScaledInstance(DOT_SIZE, DOT_SIZE, Image.SCALE_SMOOTH);
-
-        //ImageIcon iia = new ImageIcon("src/main/resources/apple.png");
-        //apple = iia.getImage();
+        ball = iid.getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
 
         BufferedImage iia = null;
         try{
@@ -85,10 +79,7 @@ public class Board extends JPanel implements ActionListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        apple = iid.getScaledInstance(DOT_SIZE, DOT_SIZE, Image.SCALE_SMOOTH);
-
-        //ImageIcon iih = new ImageIcon("src/main/resources/head.png");
-        //head = iih.getImage();
+        apple = iia.getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
 
         BufferedImage iih = null;
         try{
@@ -96,14 +87,14 @@ public class Board extends JPanel implements ActionListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        head = iih.getScaledInstance(DOT_SIZE, DOT_SIZE, Image.SCALE_SMOOTH);
+        head = iih.getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
     }
 
     private void initGame() {
 
-        dots = 3;
+        length = 3;
 
-        for (int z = 0; z < dots; z++) {
+        for (int z = 0; z < length; z++) {
             x[z] = 50 - z * 10;
             y[z] = 50;
         }
@@ -127,7 +118,7 @@ public class Board extends JPanel implements ActionListener {
 
             g.drawImage(apple, appleX, appleY, this);
 
-            for (int z = 0; z < dots; z++) {
+            for (int z = 0; z < length; z++) {
                 if (z == 0) {
                     g.drawImage(head, x[z], y[z], this);
                 } else {
@@ -158,38 +149,38 @@ public class Board extends JPanel implements ActionListener {
 
         if ((x[0] == appleX) && (y[0] == appleY)) {
 
-            dots++;
+            length++;
             locateApple();
         }
     }
 
     private void move() {
 
-        for (int z = dots; z > 0; z--) {
+        for (int z = length; z > 0; z--) {
             x[z] = x[(z - 1)];
             y[z] = y[(z - 1)];
         }
 
-        if (leftDirection) {
-            x[0] -= DOT_SIZE;
+        if (direction.equals(Board.Direction.LEFT)) {
+            x[0] -= SQUARE_SIZE;
         }
 
-        if (rightDirection) {
-            x[0] += DOT_SIZE;
+        if (direction.equals(Board.Direction.RIGHT)) {
+            x[0] += SQUARE_SIZE;
         }
 
-        if (upDirection) {
-            y[0] -= DOT_SIZE;
+        if (direction.equals(Board.Direction.UP)) {
+            y[0] -= SQUARE_SIZE;
         }
 
-        if (downDirection) {
-            y[0] += DOT_SIZE;
+        if (direction.equals(Board.Direction.DOWN)) {
+            y[0] += SQUARE_SIZE;
         }
     }
 
     private void checkCollision() {
 
-        for (int z = dots; z > 0; z--) {
+        for (int z = length; z > 0; z--) {
 
             if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
                 inGame = false;
@@ -218,11 +209,11 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void locateApple() {
-        int r = (int) (Math.random() * (B_WIDTH / DOT_SIZE));
-        appleX = r * DOT_SIZE - DOT_SIZE/2;
+        int r = (int) (Math.random() * (B_WIDTH / SQUARE_SIZE));
+        appleX = r * SQUARE_SIZE - SQUARE_SIZE/2;
 
-        r = (int) (Math.random() * (B_HEIGHT / DOT_SIZE));
-        appleY = r * DOT_SIZE - DOT_SIZE/2;
+        r = (int) (Math.random() * (B_HEIGHT / SQUARE_SIZE));
+        appleY = r * SQUARE_SIZE - SQUARE_SIZE/2;
     }
 
     @Override
@@ -245,28 +236,20 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
-                leftDirection = true;
-                upDirection = false;
-                downDirection = false;
+            if ((key == KeyEvent.VK_LEFT) && (!direction.equals(Direction.RIGHT))) {
+                direction = Direction.LEFT;
             }
 
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-                rightDirection = true;
-                upDirection = false;
-                downDirection = false;
+            if ((key == KeyEvent.VK_RIGHT) && (!direction.equals(Direction.LEFT))) {
+                direction = Direction.RIGHT;
             }
 
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-                upDirection = true;
-                rightDirection = false;
-                leftDirection = false;
+            if ((key == KeyEvent.VK_UP) && (!direction.equals(Direction.DOWN))) {
+                direction = Direction.UP;
             }
 
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-                downDirection = true;
-                rightDirection = false;
-                leftDirection = false;
+            if ((key == KeyEvent.VK_DOWN) && (!direction.equals(Direction.UP))) {
+                direction = Direction.DOWN;
             }
         }
     }
