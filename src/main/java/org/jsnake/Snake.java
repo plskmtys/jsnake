@@ -10,8 +10,11 @@ public class Snake extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private Board gameBoard;
+    private LeaderBoard leaderBoard;
+    private ScoreKeeper scoreKeeper;
 
     public Snake() {
+        scoreKeeper = new ScoreKeeper();
         initUI();
     }
 
@@ -21,13 +24,17 @@ public class Snake extends JFrame {
 
         MainMenu mainMenu = new MainMenu(
             e -> showGameBoard(),
+            e -> showLeaderBoard(),
             e -> System.exit(0)
         );
 
-        gameBoard = new Board();
+        // Pass the scoreKeeper to Board
+        gameBoard = new Board(scoreKeeper);  // Modified line
+        leaderBoard = new LeaderBoard(scoreKeeper);
 
         mainPanel.add(mainMenu, "MainMenu");
         mainPanel.add(gameBoard, "GameBoard");
+        mainPanel.add(leaderBoard, "LeaderBoard");
 
         add(mainPanel);
 
@@ -39,11 +46,17 @@ public class Snake extends JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     }
 
+    private void showLeaderBoard() {
+        leaderBoard.updateLeaderboard();
+        cardLayout.show(mainPanel, "LeaderBoard");
+    }
+
     public void showMainMenu() {
         cardLayout.show(mainPanel, "MainMenu");
     }
 
     private void showGameBoard() {
+        gameBoard.resetGame(); // Reset the game state
         cardLayout.show(mainPanel, "GameBoard");
         gameBoard.requestFocusInWindow(); // Request focus for the game board
     }

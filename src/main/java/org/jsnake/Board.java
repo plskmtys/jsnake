@@ -32,7 +32,6 @@ public class Board extends JPanel implements ActionListener {
     private static final int B_WIDTH = SQUARE_SIZE * 40;
     private static final int B_HEIGHT = SQUARE_SIZE * 40;
     private static final int MAXLEN = 900;
-    private static final int RAND_POS = 29;
     private static final int DELAY = 100;
 
     private final int[] snakex = new int[MAXLEN];
@@ -50,9 +49,10 @@ public class Board extends JPanel implements ActionListener {
     private Image tail;
     private Image bodyStraight;
     private Image bodyBent;
+    private ScoreKeeper scoreKeeper;
 
-    public Board() {
-        
+    public Board(ScoreKeeper scoreKeeper) {  // Modified constructor
+        this.scoreKeeper = scoreKeeper;
         initBoard();
     }
     
@@ -80,22 +80,42 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
-
         length = 3;
+        scoreKeeper.resetScore();
 
+        // Reset snake position
         for (int z = 0; z < length; z++) {
-            snakex[z] = 0;//B_WIDTH / 4 - z * SQUARE_SIZE    ;
+            snakex[z] = 0;
             snakey[z] = B_HEIGHT / 2;
         }
         
         locateApple();
 
+        // Create and start new timer
         timer = new Timer(DELAY, this);
         timer.start();
     }
 
     public void resetGame() {
+        // Remove any components added during game over
+        removeAll();
+        setLayout(null); // Reset layout
+        
+        // Reset game state
+        inGame = true;
+        direction = Direction.RIGHT;
+        
+        // Stop existing timer if running
+        if (timer != null) {
+            timer.stop();
+        }
+        
+        // Initialize new game
         initGame();
+        
+        // Ensure the panel is updated
+        revalidate();
+        repaint();
     }
 
     @Override
@@ -201,17 +221,22 @@ public class Board extends JPanel implements ActionListener {
 
     private void gameOver(Graphics g) {
         String msg = "Game Over";
+        String scoreMsg = "Score: " + scoreKeeper.getCurrentScore();
         Font small = new Font("Helvetica", Font.BOLD, 20);
         FontMetrics metr = getFontMetrics(small);
-    
+
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
-    
+        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, B_HEIGHT / 2 + 30);
+
         JButton mainMenuButton = new JButton("Return to Main Menu");
-        mainMenuButton.setBounds((B_WIDTH - 200) / 2, B_HEIGHT / 2 + 30, 200, 30);
-        mainMenuButton.addActionListener(e -> returnToMainMenu());
-    
+        mainMenuButton.setBounds((B_WIDTH - 200) / 2, B_HEIGHT / 2 + 60, 200, 30);
+        mainMenuButton.addActionListener(e -> {
+            scoreKeeper.saveScore();
+            returnToMainMenu();
+        });
+
         setLayout(null);
         add(mainMenuButton);
         SwingUtilities.updateComponentTreeUI(this);
@@ -226,10 +251,9 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkApple() {
-
         if ((snakex[0] == appleX) && (snakey[0] == appleY)) {
-
             length++;
+            scoreKeeper.increaseScore();
             locateApple();
         }
     }
