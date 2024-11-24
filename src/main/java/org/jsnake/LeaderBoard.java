@@ -18,8 +18,8 @@ public class LeaderBoard extends JPanel {
     public void updateLeaderboard() {
         removeAll();
 
-        List<Integer> scores = new ArrayList<>(scoreKeeper.getScores()); // Create a copy of scores
-        scores.sort(Collections.reverseOrder()); // Sort in descending order
+        List<Integer> scores = new ArrayList<>(scoreKeeper.getScores());
+        scores.sort(Collections.reverseOrder());
 
         String[] columnNames = {"Rank", "Score"};
         Object[][] data = new Object[scores.size()][2];
@@ -30,11 +30,10 @@ public class LeaderBoard extends JPanel {
         }
 
         JTable table = new JTable(data, columnNames);
-        table.setEnabled(false); // Make table non-editable
+        table.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Add a title above the table
         JLabel titleLabel = new JLabel("High Scores", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);

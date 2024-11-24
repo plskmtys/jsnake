@@ -51,7 +51,7 @@ public class Board extends JPanel implements ActionListener {
     private Image bodyBent;
     private ScoreKeeper scoreKeeper;
 
-    public Board(ScoreKeeper scoreKeeper) {  // Modified constructor
+    public Board(ScoreKeeper scoreKeeper) {
         this.scoreKeeper = scoreKeeper;
         initBoard();
     }
@@ -83,7 +83,6 @@ public class Board extends JPanel implements ActionListener {
         length = 3;
         scoreKeeper.resetScore();
 
-        // Reset snake position
         for (int z = 0; z < length; z++) {
             snakex[z] = 0;
             snakey[z] = B_HEIGHT / 2;
@@ -91,29 +90,23 @@ public class Board extends JPanel implements ActionListener {
         
         locateApple();
 
-        // Create and start new timer
         timer = new Timer(DELAY, this);
         timer.start();
     }
 
     public void resetGame() {
-        // Remove any components added during game over
         removeAll();
-        setLayout(null); // Reset layout
+        setLayout(null);
         
-        // Reset game state
         inGame = true;
         direction = Direction.RIGHT;
         
-        // Stop existing timer if running
         if (timer != null) {
             timer.stop();
         }
         
-        // Initialize new game
         initGame();
         
-        // Ensure the panel is updated
         revalidate();
         repaint();
     }
@@ -129,14 +122,13 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawGrid(Graphics g) {
-        g.setColor(Color.GRAY); // Set the color for the grid lines
-
+        g.setColor(Color.GRAY);
         for (int i = 0; i <= B_WIDTH; i += SQUARE_SIZE) {
-            g.drawLine(i, 0, i, B_HEIGHT); // Draw vertical lines
+            g.drawLine(i, 0, i, B_HEIGHT);
         }
 
         for (int j = 0; j <= B_HEIGHT; j += SQUARE_SIZE) {
-            g.drawLine(0, j, B_WIDTH, j); // Draw horizontal lines
+            g.drawLine(0, j, B_WIDTH, j);
         }
     }
     

@@ -28,8 +28,7 @@ public class Snake extends JFrame {
             e -> System.exit(0)
         );
 
-        // Pass the scoreKeeper to Board
-        gameBoard = new Board(scoreKeeper);  // Modified line
+        gameBoard = new Board(scoreKeeper);
         leaderBoard = new LeaderBoard(scoreKeeper);
 
         mainPanel.add(mainMenu, "MainMenu");
@@ -56,9 +55,9 @@ public class Snake extends JFrame {
     }
 
     private void showGameBoard() {
-        gameBoard.resetGame(); // Reset the game state
+        gameBoard.resetGame();
         cardLayout.show(mainPanel, "GameBoard");
-        gameBoard.requestFocusInWindow(); // Request focus for the game board
+        gameBoard.requestFocusInWindow();
     }
 
     public static void main(String[] args) {
