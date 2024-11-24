@@ -15,11 +15,12 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.image.*;
 import java.awt.Graphics2D;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class Board extends JPanel implements ActionListener {
     
@@ -34,8 +35,8 @@ public class Board extends JPanel implements ActionListener {
     private static final int RAND_POS = 29;
     private static final int DELAY = 100;
 
-    private final int x[] = new int[MAXLEN];
-    private final int y[] = new int[MAXLEN];
+    private final int[] snakex = new int[MAXLEN];
+    private final int[] snakey = new int[MAXLEN];
 
     private int length;
     private int appleX;
@@ -44,7 +45,6 @@ public class Board extends JPanel implements ActionListener {
     private Direction direction = Direction.RIGHT;
 
     private Timer timer;
-    private Image ball;
     private Image apple;
     private Image head;
     private Image tail;
@@ -56,7 +56,7 @@ public class Board extends JPanel implements ActionListener {
         initBoard();
     }
     
-    private void initBoard() {
+    public void initBoard() {
 
         addKeyListener(new TAdapter());
         setBackground(Color.black);
@@ -69,7 +69,6 @@ public class Board extends JPanel implements ActionListener {
 
     private void loadImages() {
         try {
-            ball = ImageIO.read(new File("src/main/resources/dot.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
             apple = ImageIO.read(new File("src/main/resources/apple.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
             head = ImageIO.read(new File("src/main/resources/snake_head.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
             tail = ImageIO.read(new File("src/main/resources/snake_tail.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
@@ -85,8 +84,8 @@ public class Board extends JPanel implements ActionListener {
         length = 3;
 
         for (int z = 0; z < length; z++) {
-            x[z] = B_WIDTH / 2 - z * SQUARE_SIZE    ;
-            y[z] = B_HEIGHT / 2;
+            snakex[z] = 0;//B_WIDTH / 4 - z * SQUARE_SIZE    ;
+            snakey[z] = B_HEIGHT / 2;
         }
         
         locateApple();
@@ -95,11 +94,18 @@ public class Board extends JPanel implements ActionListener {
         timer.start();
     }
 
+    public void resetGame() {
+        initGame();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawGrid(g);
         doDrawing(g);
+        if(!inGame){
+            gameOver(g);
+        }
     }
 
     private void drawGrid(Graphics g) {
@@ -115,23 +121,19 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void doDrawing(Graphics g) {
-        if (inGame) {
-            g.drawImage(apple, appleX, appleY, this);
+        g.drawImage(apple, appleX, appleY, this);
 
-            for (int z = 0; z < length; z++) {
-                if (z == 0) {
-                    drawHead(g, x[z], y[z]);
-                } else if (z == length - 1) {
-                    drawTail(g, x[z], y[z]);
-                } else {
-                    drawBodySegment(g, z);
-                }
+        for (int z = 0; z < length; z++) {
+            if (z == 0) {
+                drawHead(g, snakex[z], snakey[z]);
+            } else if (z == length - 1) {
+                drawTail(g, snakex[z], snakey[z]);
+            } else {
+                drawBodySegment(g, z);
             }
-
-            Toolkit.getDefaultToolkit().sync();
-        } else {
-            gameOver(g);
         }
+
+        Toolkit.getDefaultToolkit().sync();
     }
 
     private void drawHead(Graphics g, int x, int y) {
@@ -144,13 +146,13 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawBodySegment(Graphics g, int z) {
-        Direction prevDirection = getDirection(x[z], y[z], x[z - 1], y[z - 1]);
-        Direction nextDirection = getDirection(x[z], y[z], x[z + 1], y[z + 1]);
+        Direction prevDirection = getDirection(snakex[z], snakey[z], snakex[z - 1], snakey[z - 1]);
+        Direction nextDirection = getDirection(snakex[z], snakey[z], snakex[z + 1], snakey[z + 1]);
 
         if (prevDirection == nextDirection || areOpposite(prevDirection, nextDirection)) {
-            drawRotatedImage(g, bodyStraight, x[z], y[z], directionToAngle(prevDirection));
+            drawRotatedImage(g, bodyStraight, snakex[z], snakey[z], directionToAngle(prevDirection));
         } else {
-            drawRotatedImage(g, bodyBent, x[z], y[z], getBendAngle(prevDirection, nextDirection));
+            drawRotatedImage(g, bodyBent, snakex[z], snakey[z], getBendAngle(prevDirection, nextDirection));
         }
     }
 
@@ -181,7 +183,7 @@ public class Board extends JPanel implements ActionListener {
 
     private Direction getTailDirection() {
         if (length < 2) return direction;
-        return getDirection(x[length - 1], y[length - 1], x[length - 2], y[length - 2]);
+        return getDirection(snakex[length - 1], snakey[length - 1], snakex[length - 2], snakey[length - 2]);
     }
 
     private double getBendAngle(Direction prevDirection, Direction nextDirection) {
@@ -198,19 +200,34 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void gameOver(Graphics g) {
-        
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 20);
         FontMetrics metr = getFontMetrics(small);
-
+    
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+    
+        JButton mainMenuButton = new JButton("Return to Main Menu");
+        mainMenuButton.setBounds((B_WIDTH - 200) / 2, B_HEIGHT / 2 + 30, 200, 30);
+        mainMenuButton.addActionListener(e -> returnToMainMenu());
+    
+        setLayout(null);
+        add(mainMenuButton);
+        SwingUtilities.updateComponentTreeUI(this);
+    }
+
+    private void returnToMainMenu() {
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        if (topFrame instanceof Snake) {
+            Snake snake = (Snake) topFrame;
+            snake.showMainMenu();
+        }
     }
 
     private void checkApple() {
 
-        if ((x[0] == appleX) && (y[0] == appleY)) {
+        if ((snakex[0] == appleX) && (snakey[0] == appleY)) {
 
             length++;
             locateApple();
@@ -220,50 +237,48 @@ public class Board extends JPanel implements ActionListener {
     private void move() {
 
         for (int z = length; z > 0; z--) {
-            x[z] = x[(z - 1)];
-            y[z] = y[(z - 1)];
+            snakex[z] = snakex[(z - 1)];
+            snakey[z] = snakey[(z - 1)];
         }
 
 
         if (direction.equals(Board.Direction.LEFT)) {
-            x[0] -= SQUARE_SIZE;
+            snakex[0] -= SQUARE_SIZE;
         }
 
         if (direction.equals(Board.Direction.RIGHT)) {
-            x[0] += SQUARE_SIZE;
+            snakex[0] += SQUARE_SIZE;
         }
 
         if (direction.equals(Board.Direction.UP)) {
-            y[0] -= SQUARE_SIZE;
+            snakey[0] -= SQUARE_SIZE;
         }
 
         if (direction.equals(Board.Direction.DOWN)) {
-            y[0] += SQUARE_SIZE;
+            snakey[0] += SQUARE_SIZE;
         }
     }
 
     private void checkCollision() {
-
         for (int z = length; z > 0; z--) {
-
-            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+            if ((z > 4) && (snakex[0] == snakex[z]) && (snakey[0] == snakey[z])) {
                 inGame = false;
             }
         }
 
-        if (y[0] >= B_HEIGHT) {
+        if (snakey[0] >= B_HEIGHT) {
             inGame = false;
         }
 
-        if (y[0] < 0) {
+        if (snakey[0] < 0) {
             inGame = false;
         }
 
-        if (x[0] >= B_WIDTH) {
+        if (snakex[0] >= B_WIDTH) {
             inGame = false;
         }
 
-        if (x[0] < 0) {
+        if (snakex[0] < 0) {
             inGame = false;
         }
         
@@ -282,12 +297,12 @@ public class Board extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (inGame) {
-
             checkApple();
             checkCollision();
             move();
+        } else {
+            timer.stop();
         }
 
         repaint();
