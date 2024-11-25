@@ -37,9 +37,9 @@ public class Board extends JPanel implements ActionListener {
     private static final int B_HEIGHT = SQUARE_SIZE * 40;
     private static final int DELAY = 100;
     
-    private Image apple;
-    private int appleX;
-    private int appleY;
+    private Fruit fruit;
+    private int fruitX;
+    private int fruitY;
 
     private boolean inGame = true;
     private ScoreKeeper scoreKeeper;
@@ -110,11 +110,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void loadImages() {
-        try {
-            apple = ImageIO.read(new File("src/main/resources/apple.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         playerSnake.loadImages();
         aiSnake.loadImages();
     }
@@ -123,7 +118,7 @@ public class Board extends JPanel implements ActionListener {
         scoreKeeper.resetScore();
         
         aiSnakeController = new AiSnakeController(aiSnake, playerSnake);
-        locateApple();
+        locateFruit();
 
         timer = new Timer(DELAY, this);
         timer.start();
@@ -178,7 +173,7 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void doDrawing(Graphics g) {
-        g.drawImage(apple, appleX, appleY, this);
+        g.drawImage(fruit.getImage(), fruitX, fruitY, this);
 
         playerSnake.doDrawing(g);
         if(isAiPlaying) aiSnake.doDrawing(g);
@@ -217,14 +212,14 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void checkApple() {
-        if (playerSnake.getHeadPos().equals(new Point(appleX, appleY))) {
-            playerSnake.eat(1);
-            scoreKeeper.increaseScore();
-            locateApple();
-        } else if (isAiPlaying && aiSnake.getHeadPos().equals(new Point(appleX, appleY))){
-            aiSnake.eat(1);
-            locateApple();
+    private void checkFruit() {
+        if (playerSnake.getHeadPos().equals(new Point(fruitX, fruitY))) {
+            playerSnake.eat(fruit);
+            scoreKeeper.increaseScore(fruit.getValue());
+            locateFruit();
+        } else if (isAiPlaying && aiSnake.getHeadPos().equals(new Point(fruitX, fruitY))){
+            aiSnake.eat(fruit);
+            locateFruit();
         }
     }
 
@@ -250,20 +245,46 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void locateApple() {
-        int r = (int) (Math.random() * (B_WIDTH / SQUARE_SIZE));
-        appleX = r * SQUARE_SIZE;
+    private void locateFruit() {
+        boolean validPosition = false;
+        while (!validPosition) {
+            fruit = FruitGenerator.generateFruit();
 
-        r = (int) (Math.random() * (B_HEIGHT / SQUARE_SIZE));
-        appleY = r * SQUARE_SIZE;
+            int r = (int) (Math.random() * (B_WIDTH / SQUARE_SIZE));
+            fruitX = r * SQUARE_SIZE;
 
-        if(isAiPlaying) aiSnakeController.setTarget(new Point(appleX, appleY));
+            r = (int) (Math.random() * (B_HEIGHT / SQUARE_SIZE));
+            fruitY = r * SQUARE_SIZE;
+
+            Point fruitPosition = new Point(fruitX, fruitY);
+            validPosition = true;
+
+            // Check if the fruit position collides with the playerSnake
+            for (int i = 0; i < playerSnake.getLength(); i++) {
+                if (fruitPosition.equals(new Point(playerSnake.getSnakex()[i], playerSnake.getSnakey()[i]))) {
+                    validPosition = false;
+                    break;
+                }
+            }
+
+            // Check if the fruit position collides with the aiSnake
+            if (validPosition && isAiPlaying) {
+                for (int i = 0; i < aiSnake.getLength(); i++) {
+                    if (fruitPosition.equals(new Point(aiSnake.getSnakex()[i], aiSnake.getSnakey()[i]))) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (isAiPlaying) aiSnakeController.setTarget(new Point(fruitX, fruitY));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
-            checkApple();
+            checkFruit();
             checkCollision();
             playerSnake.move();
             if(isAiPlaying){

@@ -19,8 +19,8 @@ public class ScoreKeeper {
         currentScore = 0;
     }
 
-    public void increaseScore() {
-        currentScore++;
+    public void increaseScore(int amount) {
+        currentScore+=amount;
     }
 
     public int getCurrentScore() {

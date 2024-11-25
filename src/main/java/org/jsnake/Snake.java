@@ -50,8 +50,15 @@ public class Snake {
         }
     }
 
-    void eat(int value){
-        length += value;
+    void eat(Fruit fruit) {
+        // Increase the length of the snake
+        length += fruit.getValue();
+
+        // Add new segments at the tail's position
+        for (int i = 0; i < fruit.getValue(); i++) {
+            snakex[length - 1 - i] = snakex[length - 2 - i];
+            snakey[length - 1 - i] = snakey[length - 2 - i];
+        }
     }
 
     Point getHeadPos(){
