@@ -1,6 +1,7 @@
 package org.jsnake;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -21,47 +22,86 @@ import java.awt.Graphics2D;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import java.awt.AlphaComposite;
+import java.awt.image.BufferedImage;
 
 public class Board extends JPanel implements ActionListener {
-    
-    private enum Direction {
-        UP, DOWN, LEFT, RIGHT
-    }
+
+    static final int LEFTKEY = KeyEvent.VK_A;
+    static final int RIGHTKEY = KeyEvent.VK_D;
+    static final int UPKEY = KeyEvent.VK_W;
+    static final int DOWNKEY = KeyEvent.VK_S;
     
     private static final int SQUARE_SIZE = 16;
     private static final int B_WIDTH = SQUARE_SIZE * 40;
     private static final int B_HEIGHT = SQUARE_SIZE * 40;
-    private static final int MAXLEN = 900;
     private static final int DELAY = 100;
-
-    private final int[] snakex = new int[MAXLEN];
-    private final int[] snakey = new int[MAXLEN];
-
-    private int length;
+    
+    private Image apple;
     private int appleX;
     private int appleY;
+
     private boolean inGame = true;
-    private Direction direction = Direction.RIGHT;
-
-    private Timer timer;
-    private Image apple;
-    private Image head;
-    private Image tail;
-    private Image bodyStraight;
-    private Image bodyBent;
     private ScoreKeeper scoreKeeper;
+    private Timer timer;
+    private Color color;
+    private Snake playerSnake;
+    private Snake aiSnake;
+    private Color playerSnakeColor;
+    private Color aiSnakeColor;
 
-    public Board(ScoreKeeper scoreKeeper) {
+    public int getSquareSize(){
+        return SQUARE_SIZE;
+    }
+
+    public int getBoardHeight(){
+        return B_HEIGHT;
+    }
+
+    public int getBoardWidth(){
+        return B_WIDTH;
+    }
+
+    public Board(ScoreKeeper scoreKeeper, Color color, Color playerSnakeColor, Color aiSnakeColor) {
         this.scoreKeeper = scoreKeeper;
+        this.color = color;
+
+        this.playerSnakeColor = playerSnakeColor;
+        this.aiSnakeColor = aiSnakeColor;
+
+        this.playerSnake = new Snake(3, new Point(5, 5), playerSnakeColor, Direction.RIGHT, this);
+        this.aiSnake = new Snake(3, new Point(5, 20), aiSnakeColor, Direction.RIGHT, this);
         initBoard();
+    }
+
+    public void setPlayerSnakeColor(Color color) {
+        playerSnakeColor = color;
+        if (playerSnake != null) {
+            playerSnake.setColor(color);
+            playerSnake.loadImages(); // Reload textures with new color
+            repaint();
+        }
+    }
+
+    public void setAiSnakeColor(Color color) {
+        aiSnakeColor = color;
+        if (aiSnake != null) {
+            aiSnake.setColor(color);
+            aiSnake.loadImages(); // Reload textures with new color
+            repaint();
+        }
+    }
+
+    public void setBackgroundColor(Color color) {
+        this.color = color;
+        setBackground(color);
+        repaint();
     }
     
     public void initBoard() {
-
         addKeyListener(new TAdapter());
-        setBackground(Color.black);
+        setBackground(color);
         setFocusable(true);
-
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
         initGame();
@@ -70,23 +110,15 @@ public class Board extends JPanel implements ActionListener {
     private void loadImages() {
         try {
             apple = ImageIO.read(new File("src/main/resources/apple.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
-            head = ImageIO.read(new File("src/main/resources/snake_head.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
-            tail = ImageIO.read(new File("src/main/resources/snake_tail.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
-            bodyStraight = ImageIO.read(new File("src/main/resources/snake_body_straight.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
-            bodyBent = ImageIO.read(new File("src/main/resources/snake_body_bent.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_SMOOTH);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        playerSnake.loadImages();
+        aiSnake.loadImages();
     }
 
     private void initGame() {
-        length = 3;
         scoreKeeper.resetScore();
-
-        for (int z = 0; z < length; z++) {
-            snakex[z] = 0;
-            snakey[z] = B_HEIGHT / 2;
-        }
         
         locateApple();
 
@@ -99,12 +131,16 @@ public class Board extends JPanel implements ActionListener {
         setLayout(null);
         
         inGame = true;
-        direction = Direction.RIGHT;
         
         if (timer != null) {
             timer.stop();
         }
         
+        // Use stored colors when resetting
+        setBackground(color);
+        playerSnake.resetTo(3, new Point(5,5), playerSnakeColor);
+        aiSnake.resetTo(3, new Point(5,20), aiSnakeColor);
+
         initGame();
         
         revalidate();
@@ -114,7 +150,7 @@ public class Board extends JPanel implements ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        drawGrid(g);
+        //drawGrid(g);
         doDrawing(g);
         if(!inGame){
             gameOver(g);
@@ -122,93 +158,29 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawGrid(Graphics g) {
-        g.setColor(Color.GRAY);
-        for (int i = 0; i <= B_WIDTH; i += SQUARE_SIZE) {
-            g.drawLine(i, 0, i, B_HEIGHT);
-        }
-
-        for (int j = 0; j <= B_HEIGHT; j += SQUARE_SIZE) {
-            g.drawLine(0, j, B_WIDTH, j);
+        Color darkSquare = new Color(40, 40, 40);
+        Color lightSquare = new Color(60, 60, 60);
+        
+        for (int i = 0; i < B_WIDTH; i += SQUARE_SIZE) {
+            for (int j = 0; j < B_HEIGHT; j += SQUARE_SIZE) {
+                // If sum of row and column is even, use light color
+                if ((i / SQUARE_SIZE + j / SQUARE_SIZE) % 2 == 0) {
+                    g.setColor(lightSquare);
+                } else {
+                    g.setColor(darkSquare);
+                }
+                g.fillRect(i, j, SQUARE_SIZE, SQUARE_SIZE);
+            }
         }
     }
     
     private void doDrawing(Graphics g) {
         g.drawImage(apple, appleX, appleY, this);
 
-        for (int z = 0; z < length; z++) {
-            if (z == 0) {
-                drawHead(g, snakex[z], snakey[z]);
-            } else if (z == length - 1) {
-                drawTail(g, snakex[z], snakey[z]);
-            } else {
-                drawBodySegment(g, z);
-            }
-        }
+        playerSnake.doDrawing(g);
+        aiSnake.doDrawing(g);
 
         Toolkit.getDefaultToolkit().sync();
-    }
-
-    private void drawHead(Graphics g, int x, int y) {
-        drawRotatedImage(g, head, x, y, directionToAngle(direction));
-    }
-
-    private void drawTail(Graphics g, int x, int y) {
-        Direction tailDirection = getTailDirection();
-        drawRotatedImage(g, tail, x, y, directionToAngle(tailDirection));
-    }
-
-    private void drawBodySegment(Graphics g, int z) {
-        Direction prevDirection = getDirection(snakex[z], snakey[z], snakex[z - 1], snakey[z - 1]);
-        Direction nextDirection = getDirection(snakex[z], snakey[z], snakex[z + 1], snakey[z + 1]);
-
-        if (prevDirection == nextDirection || areOpposite(prevDirection, nextDirection)) {
-            drawRotatedImage(g, bodyStraight, snakex[z], snakey[z], directionToAngle(prevDirection));
-        } else {
-            drawRotatedImage(g, bodyBent, snakex[z], snakey[z], getBendAngle(prevDirection, nextDirection));
-        }
-    }
-
-    private void drawRotatedImage(Graphics g, Image image, int x, int y, double angle) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.rotate(Math.toRadians(angle), x + SQUARE_SIZE / 2, y + SQUARE_SIZE / 2);
-        g2d.drawImage(image, x, y, this);
-        g2d.rotate(Math.toRadians(-angle), x + SQUARE_SIZE / 2, y + SQUARE_SIZE / 2);
-    }
-
-    private double directionToAngle(Direction direction) {
-        switch (direction) {
-            case UP: return 0;
-            case RIGHT: return 90;
-            case DOWN: return 180;
-            case LEFT: return 270;
-        }
-        return 0;
-    }
-
-    private Direction getDirection(int x1, int y1, int x2, int y2) {
-        if (x1 == x2) {
-            return y1 > y2 ? Direction.UP : Direction.DOWN;
-        } else {
-            return x1 > x2 ? Direction.LEFT : Direction.RIGHT;
-        }
-    }
-
-    private Direction getTailDirection() {
-        if (length < 2) return direction;
-        return getDirection(snakex[length - 1], snakey[length - 1], snakex[length - 2], snakey[length - 2]);
-    }
-
-    private double getBendAngle(Direction prevDirection, Direction nextDirection) {
-        if ((prevDirection == Direction.UP && nextDirection == Direction.RIGHT) || (prevDirection == Direction.RIGHT && nextDirection == Direction.UP)) {
-            return 0;
-        } else if ((prevDirection == Direction.RIGHT && nextDirection == Direction.DOWN) || (prevDirection == Direction.DOWN && nextDirection == Direction.RIGHT)) {
-            return 90;
-        } else if ((prevDirection == Direction.DOWN && nextDirection == Direction.LEFT) || (prevDirection == Direction.LEFT && nextDirection == Direction.DOWN)) {
-            return 180;
-        } else if ((prevDirection == Direction.LEFT && nextDirection == Direction.UP) || (prevDirection == Direction.UP && nextDirection == Direction.LEFT)) {
-            return 270;
-        }
-        return 0;
     }
 
     private void gameOver(Graphics g) {
@@ -236,65 +208,41 @@ public class Board extends JPanel implements ActionListener {
 
     private void returnToMainMenu() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        if (topFrame instanceof Snake) {
-            Snake snake = (Snake) topFrame;
+        if (topFrame instanceof SnakeGame) {
+            SnakeGame snake = (SnakeGame) topFrame;
             snake.showMainMenu();
         }
     }
 
     private void checkApple() {
-        if ((snakex[0] == appleX) && (snakey[0] == appleY)) {
-            length++;
+        if (playerSnake.getHeadPos().equals(new Point(appleX, appleY))) {
+            playerSnake.eat(1);
             scoreKeeper.increaseScore();
+            locateApple();
+        } else if (aiSnake.getHeadPos().equals(new Point(appleX, appleY))){
+            aiSnake.eat(1);
             locateApple();
         }
     }
 
-    private void move() {
-
-        for (int z = length; z > 0; z--) {
-            snakex[z] = snakex[(z - 1)];
-            snakey[z] = snakey[(z - 1)];
-        }
-
-
-        if (direction.equals(Board.Direction.LEFT)) {
-            snakex[0] -= SQUARE_SIZE;
-        }
-
-        if (direction.equals(Board.Direction.RIGHT)) {
-            snakex[0] += SQUARE_SIZE;
-        }
-
-        if (direction.equals(Board.Direction.UP)) {
-            snakey[0] -= SQUARE_SIZE;
-        }
-
-        if (direction.equals(Board.Direction.DOWN)) {
-            snakey[0] += SQUARE_SIZE;
-        }
-    }
-
     private void checkCollision() {
-        for (int z = length; z > 0; z--) {
-            if ((z > 4) && (snakex[0] == snakex[z]) && (snakey[0] == snakey[z])) {
-                inGame = false;
-            }
-        }
-
-        if (snakey[0] >= B_HEIGHT) {
+        if(playerSnake.checkCollision()){
             inGame = false;
         }
 
-        if (snakey[0] < 0) {
+        if (playerSnake.getHeadPos().getY() >= B_HEIGHT) {
             inGame = false;
         }
 
-        if (snakex[0] >= B_WIDTH) {
+        if (playerSnake.getHeadPos().getY() < 0) {
             inGame = false;
         }
 
-        if (snakex[0] < 0) {
+        if (playerSnake.getHeadPos().getX() >= B_WIDTH) {
+            inGame = false;
+        }
+
+        if (playerSnake.getHeadPos().getX() < 0) {
             inGame = false;
         }
         
@@ -316,19 +264,13 @@ public class Board extends JPanel implements ActionListener {
         if (inGame) {
             checkApple();
             checkCollision();
-            move();
+            playerSnake.move();
+            aiSnake.move();
         } else {
             timer.stop();
         }
 
         repaint();
-    }
-
-    private boolean areOpposite(Direction dir1, Direction dir2) {
-        return (dir1 == Direction.UP && dir2 == Direction.DOWN) ||
-               (dir1 == Direction.DOWN && dir2 == Direction.UP) ||
-               (dir1 == Direction.LEFT && dir2 == Direction.RIGHT) ||
-               (dir1 == Direction.RIGHT && dir2 == Direction.LEFT);
     }
 
     private class TAdapter extends KeyAdapter {
@@ -338,20 +280,20 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if ((key == KeyEvent.VK_LEFT) && (!direction.equals(Direction.RIGHT))) {
-                direction = Direction.LEFT;
+            if (key == LEFTKEY) {
+                playerSnake.setDirection(Direction.LEFT);
             }
 
-            if ((key == KeyEvent.VK_RIGHT) && (!direction.equals(Direction.LEFT))) {
-                direction = Direction.RIGHT;
+            if (key == RIGHTKEY) {
+                playerSnake.setDirection(Direction.RIGHT);
             }
 
-            if ((key == KeyEvent.VK_UP) && (!direction.equals(Direction.DOWN))) {
-                direction = Direction.UP;
+            if (key == UPKEY) {
+                playerSnake.setDirection(Direction.UP);
             }
 
-            if ((key == KeyEvent.VK_DOWN) && (!direction.equals(Direction.UP))) {
-                direction = Direction.DOWN;
+            if (key == DOWNKEY) {
+                playerSnake.setDirection(Direction.DOWN);
             }
         }
     }
