@@ -129,6 +129,7 @@ public class Board extends JPanel implements ActionListener {
         setLayout(null);
         
         inGame = true;
+        isAiPlaying = true;
         
         if (timer != null) {
             timer.stop();

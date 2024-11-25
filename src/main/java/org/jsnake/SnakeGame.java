@@ -83,7 +83,7 @@ public class SnakeGame extends JFrame {
     }
 
     private void showGameBoard() {
-        applySettings(); // Apply settings before resetting game
+        applySettings();
         gameBoard.resetGame();
         cardLayout.show(mainPanel, "GameBoard");
         gameBoard.requestFocusInWindow();

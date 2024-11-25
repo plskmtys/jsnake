@@ -51,6 +51,9 @@ public class Snake {
     }
 
     void eat(Fruit fruit) {
+
+        length++;
+        /*
         // Increase the length of the snake
         length += fruit.getValue();
 
@@ -59,6 +62,7 @@ public class Snake {
             snakex[length - 1 - i] = snakex[length - 2 - i];
             snakey[length - 1 - i] = snakey[length - 2 - i];
         }
+            */
     }
 
     Point getHeadPos(){
