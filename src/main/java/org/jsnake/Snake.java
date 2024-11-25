@@ -202,6 +202,32 @@ public class Snake {
                 return true;
             }
         }
+
+        if (getHeadPos().getY() >= board.getBoardHeight()) {
+            return true;
+        }
+
+        if (getHeadPos().getY() < 0) {
+            return true;
+        }
+
+        if (getHeadPos().getX() >= board.getBoardWidth()) {
+            return true;
+        }
+
+        if (getHeadPos().getX() < 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkCollision(Snake other){
+        for (int z = 0; z < other.length; z++) {
+            if ((snakex[0] == other.snakex[z]) && (snakey[0] == other.snakey[z])) {
+                return true;
+            }
+        }
         return false;
     }
 

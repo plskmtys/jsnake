@@ -3,10 +3,12 @@ package org.jsnake;
 import java.awt.CardLayout;
 import java.awt.EventQueue;
 import java.awt.Color;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.Point;
 import java.util.Map;
+import java.awt.Image;
 
 public class SnakeGame extends JFrame {
 
@@ -55,6 +57,8 @@ public class SnakeGame extends JFrame {
         setTitle("Snake");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        Image icon = new ImageIcon("src/main/resources/snake_icon_transparent_90.png").getImage();
+        setIconImage(icon);
     }
 
     private void showLeaderBoard() {

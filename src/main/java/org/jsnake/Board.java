@@ -49,6 +49,7 @@ public class Board extends JPanel implements ActionListener {
     private Snake aiSnake;
     private Color playerSnakeColor;
     private Color aiSnakeColor;
+    private boolean isAiPlaying = true;
 
     public int getSquareSize(){
         return SQUARE_SIZE;
@@ -178,7 +179,7 @@ public class Board extends JPanel implements ActionListener {
         g.drawImage(apple, appleX, appleY, this);
 
         playerSnake.doDrawing(g);
-        aiSnake.doDrawing(g);
+        if(isAiPlaying) aiSnake.doDrawing(g);
 
         Toolkit.getDefaultToolkit().sync();
     }
@@ -219,10 +220,15 @@ public class Board extends JPanel implements ActionListener {
             playerSnake.eat(1);
             scoreKeeper.increaseScore();
             locateApple();
-        } else if (aiSnake.getHeadPos().equals(new Point(appleX, appleY))){
+        } else if (isAiPlaying && aiSnake.getHeadPos().equals(new Point(appleX, appleY))){
             aiSnake.eat(1);
             locateApple();
         }
+    }
+
+    private void removeSnakeFromBoard(Snake snake) {
+        snake.resetTo(0, new Point(-2, -2), null);
+        //repaint();
     }
 
     private void checkCollision() {
@@ -230,24 +236,15 @@ public class Board extends JPanel implements ActionListener {
             inGame = false;
         }
 
-        if (playerSnake.getHeadPos().getY() >= B_HEIGHT) {
-            inGame = false;
-        }
-
-        if (playerSnake.getHeadPos().getY() < 0) {
-            inGame = false;
-        }
-
-        if (playerSnake.getHeadPos().getX() >= B_WIDTH) {
-            inGame = false;
-        }
-
-        if (playerSnake.getHeadPos().getX() < 0) {
-            inGame = false;
-        }
-        
-        if (!inGame) {
-            timer.stop();
+        if(isAiPlaying){
+            if(playerSnake.checkCollision(aiSnake)){
+                inGame = false;
+            }
+    
+            if(aiSnake.checkCollision() || aiSnake.checkCollision(playerSnake)){
+                removeSnakeFromBoard(aiSnake);
+                isAiPlaying = false;
+            }
         }
     }
 
