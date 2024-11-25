@@ -48,8 +48,8 @@ public class LeaderBoard extends JPanel {
 
     private void returnToMainMenu() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        if (topFrame instanceof Snake) {
-            Snake snake = (Snake) topFrame;
+        if (topFrame instanceof SnakeGame) {
+            SnakeGame snake = (SnakeGame) topFrame;
             snake.showMainMenu();
         }
     }

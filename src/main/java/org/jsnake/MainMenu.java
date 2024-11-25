@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 
 public class MainMenu extends JPanel {
 
-    public MainMenu(ActionListener playAction, ActionListener leaderBoardAction, ActionListener exitAction) {
+    public MainMenu(ActionListener playAction, ActionListener leaderBoardAction, ActionListener settingsAction, ActionListener exitAction) {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -23,6 +23,11 @@ public class MainMenu extends JPanel {
         JButton leaderBoardButton = new JButton("Leaderboard");
         leaderBoardButton.addActionListener(leaderBoardAction);
         add(leaderBoardButton, gbc);
+
+        gbc.gridy++;
+        JButton settingButton = new JButton("Settings");
+        settingButton.addActionListener(settingsAction);
+        add(settingButton, gbc);
 
         gbc.gridy++;
         JButton exitButton = new JButton("Exit");
