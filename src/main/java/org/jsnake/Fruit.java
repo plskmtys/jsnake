@@ -14,13 +14,11 @@ public enum Fruit {
 
     private final int value;
     private final double probability;
-    private final String imageName;
     private BufferedImage image;
 
     Fruit(int value, double probability, String imageName) {
         this.value = value;
         this.probability = probability;
-        this.imageName = imageName;
 
         try{
             this.image = ImageIO.read(new File("src/main/resources/" + imageName + ".png"));

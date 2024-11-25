@@ -20,29 +20,24 @@ public class AiSnakeController {
     public void moveTowardsTarget() {
         Point head = snake.getHeadPos();
         if (head.equals(target)) {
-            return; // Already at the target
+            return;
         }
 
-        // Define possible directions
         Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
         int[][] deltas = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
-        // Priority queue for Dijkstra's algorithm
         PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.distance));
         pq.add(new Node(head, 0, null));
 
-        // Set to track visited nodes
         Set<Point> visited = new HashSet<>();
         visited.add(head);
 
-        // Map to reconstruct the path
         Map<Point, Node> cameFrom = new HashMap<>();
 
         while (!pq.isEmpty()) {
             Node current = pq.poll();
             Point currentPos = current.position;
 
-            // If we reached the target, reconstruct the path
             if (currentPos.equals(target)) {
                 Node node = current;
                 while (node.previous != null && node.previous.previous != null) {
@@ -52,7 +47,6 @@ public class AiSnakeController {
                 return;
             }
 
-            // Explore neighbors
             for (int i = 0; i < directions.length; i++) {
                 Point neighborPos = new Point(currentPos.x + deltas[i][0] * snake.getBoard().getSquareSize(),
                                               currentPos.y + deltas[i][1] * snake.getBoard().getSquareSize());
@@ -68,20 +62,17 @@ public class AiSnakeController {
     }
 
     private boolean isValidMove(Point pos) {
-        // Check if the position is within the board boundaries
         if (pos.x < 0 || pos.x >= snake.getBoard().getBoardWidth() ||
             pos.y < 0 || pos.y >= snake.getBoard().getBoardHeight()) {
             return false;
         }
 
-        // Check for collision with the snake itself
         for (int i = 0; i < snake.getLength(); i++) {
             if (pos.equals(new Point(snake.getSnakex()[i], snake.getSnakey()[i]))) {
                 return false;
             }
         }
 
-        // Check for collision with the player snake
         for (int i = 0; i < playerSnake.getLength(); i++) {
             if (pos.equals(new Point(playerSnake.getSnakex()[i], playerSnake.getSnakey()[i]))) {
                 return false;

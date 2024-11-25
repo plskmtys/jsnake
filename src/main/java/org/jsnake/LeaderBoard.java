@@ -1,6 +1,8 @@
 package org.jsnake;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -31,14 +33,37 @@ public class LeaderBoard extends JPanel {
 
         JTable table = new JTable(data, columnNames);
         table.setEnabled(false);
+        table.setRowHeight(30);
+
+        // Center align table cells and set font size
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                c.setFont(new Font("Arial", Font.PLAIN, 20));
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        // Set font size for column headers
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Arial", Font.BOLD, 22));
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
         JLabel titleLabel = new JLabel("High Scores", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 25));
         add(titleLabel, BorderLayout.NORTH);
 
         JButton backButton = new JButton("Back to Main Menu");
+        backButton.setFont(new Font("Arial", Font.BOLD, 20));
         backButton.addActionListener(e -> returnToMainMenu());
         add(backButton, BorderLayout.SOUTH);
 

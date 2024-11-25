@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 
 public class TextureCreator {
 
-    private TextureCreator(){/* */}
+    private TextureCreator(){}
 
     public static BufferedImage applyColorWithMultiply(BufferedImage source, Color color) {
         int width = source.getWidth();

@@ -160,37 +160,18 @@ public class Board extends JPanel implements ActionListener {
         g.fillRect(0, 0, B_WIDTH, SCORE_HEIGHT);
 
         String scoreMsg = "Score: " + scoreKeeper.getCurrentScore();
-        Font small = new Font("Helvetica", Font.BOLD, 20);
+        Font small = new Font("Arial", Font.BOLD, 20);
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, 24);
     }
-
-    private void drawGrid(Graphics g) {
-        Color darkSquare = new Color(40, 40, 40);
-        Color lightSquare = new Color(60, 60, 60);
-        
-        for (int i = 0; i < B_WIDTH; i += SQUARE_SIZE) {
-            for (int j = 0; j < B_HEIGHT; j += SQUARE_SIZE) {
-                // If sum of row and column is even, use light color
-                if ((i / SQUARE_SIZE + j / SQUARE_SIZE) % 2 == 0) {
-                    g.setColor(lightSquare);
-                } else {
-                    g.setColor(darkSquare);
-                }
-                g.fillRect(i, j, SQUARE_SIZE, SQUARE_SIZE);
-            }
-        }
-    }
     
     private void doDrawing(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setClip(new Rectangle(0, SCORE_HEIGHT, B_WIDTH, B_HEIGHT));
-        g2d.translate(0, SCORE_HEIGHT); // Shift the game board down by SCORE_HEIGHT
-
-        // Clip the drawing area to exclude the score area
+        g2d.translate(0, SCORE_HEIGHT);
 
         g2d.drawImage(fruit.getImage(), fruitX, fruitY, this);
 
@@ -203,20 +184,20 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void gameOver(Graphics g) {
-        
 
         String msg = "Game Over";
         String scoreMsg = "Score: " + scoreKeeper.getCurrentScore();
-        Font small = new Font("Helvetica", Font.BOLD, 20);
+        Font small = new Font("Arial", Font.BOLD, 32);
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT + SCORE_HEIGHT) / 2);
-        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, (B_HEIGHT + SCORE_HEIGHT) / 2 + 30);
+        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, (B_HEIGHT + SCORE_HEIGHT) / 2 + 40);
 
         JButton mainMenuButton = new JButton("Return to Main Menu");
-        mainMenuButton.setBounds((B_WIDTH - 200) / 2, (B_HEIGHT) / 2 + SCORE_HEIGHT + 60, 200, 30);
+        mainMenuButton.setFont(new Font("Arial", Font.BOLD, 20));
+        mainMenuButton.setBounds((B_WIDTH - 250) / 2, (B_HEIGHT) / 2 + SCORE_HEIGHT + 60, 250, 40);
         mainMenuButton.addActionListener(e -> {
             scoreKeeper.saveScore();
             returnToMainMenu();

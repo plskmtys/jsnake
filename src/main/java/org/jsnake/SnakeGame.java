@@ -7,6 +7,10 @@ import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatDarculaLaf;
+
 import java.util.Map;
 import java.awt.Image;
 
@@ -94,6 +98,11 @@ public class SnakeGame extends JFrame {
     }
 
     public static void main(String[] args) {
+        try{
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         EventQueue.invokeLater(() -> {
             JFrame ex = new SnakeGame();
             ex.setVisible(true);

@@ -33,12 +33,15 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 32)); // Updated title text size
         add(titleLabel, gbc);
 
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        add(new JLabel("Board Color:"), gbc);
+        JLabel boardColorLabel = new JLabel("Board Color");
+        boardColorLabel.setPreferredSize(new Dimension(320, 80));
+        boardColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        add(boardColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("Board Color", boardColor, color -> {
             boardColor = color;
@@ -48,7 +51,10 @@ public class SettingsPage extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        add(new JLabel("Player Snake Color:"), gbc);
+        JLabel playerSnakeColorLabel = new JLabel("Player Snake Color");
+        playerSnakeColorLabel.setPreferredSize(new Dimension(320, 80));
+        playerSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        add(playerSnakeColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("Player Snake Color", playerSnakeColor, color -> {
             playerSnakeColor = color;
@@ -58,7 +64,10 @@ public class SettingsPage extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        add(new JLabel("AI Snake Color:"), gbc);
+        JLabel aiSnakeColorLabel = new JLabel("AI Snake Color");
+        aiSnakeColorLabel.setPreferredSize(new Dimension(320, 80));
+        aiSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        add(aiSnakeColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("AI Snake Color", aiSnakeColor, color -> {
             aiSnakeColor = color;
@@ -70,6 +79,7 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         JButton backButton = new JButton("Back to Main Menu");
+        backButton.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
         backButton.addActionListener(e -> returnToMainMenu());
         add(backButton, gbc);
     }
@@ -84,7 +94,7 @@ public class SettingsPage extends JPanel {
             }
         };
         button.setBackground(initialColor);
-        button.setPreferredSize(new Dimension(60, 30));
+        button.setPreferredSize(new Dimension(60, 60));
         button.addActionListener(e -> {
             Color newColor = JColorChooser.showDialog(this, "Choose " + name, button.getBackground());
             if (newColor != null) {
