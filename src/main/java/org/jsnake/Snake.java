@@ -58,6 +58,22 @@ public class Snake {
         return new Point(snakex[0], snakey[0]);
     }
 
+    int getLength(){
+        return length;
+    }
+
+    int[] getSnakex(){
+        return snakex;
+    }
+
+    int[] getSnakey(){
+        return snakey;
+    }
+
+    Board getBoard(){
+        return board;
+    }
+
     void loadImages(){
         try {
             BufferedImage headBase = ImageIO.read(new File("src/main/resources/snake_head_base.png"));

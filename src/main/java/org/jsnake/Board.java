@@ -49,6 +49,7 @@ public class Board extends JPanel implements ActionListener {
     private Snake aiSnake;
     private Color playerSnakeColor;
     private Color aiSnakeColor;
+    private AiSnakeController aiSnakeController;
     private boolean isAiPlaying = true;
 
     public int getSquareSize(){
@@ -121,6 +122,7 @@ public class Board extends JPanel implements ActionListener {
     private void initGame() {
         scoreKeeper.resetScore();
         
+        aiSnakeController = new AiSnakeController(aiSnake, playerSnake);
         locateApple();
 
         timer = new Timer(DELAY, this);
@@ -254,6 +256,8 @@ public class Board extends JPanel implements ActionListener {
 
         r = (int) (Math.random() * (B_HEIGHT / SQUARE_SIZE));
         appleY = r * SQUARE_SIZE;
+
+        if(isAiPlaying) aiSnakeController.setTarget(new Point(appleX, appleY));
     }
 
     @Override
@@ -262,7 +266,10 @@ public class Board extends JPanel implements ActionListener {
             checkApple();
             checkCollision();
             playerSnake.move();
-            aiSnake.move();
+            if(isAiPlaying){
+                aiSnakeController.moveTowardsTarget();
+                aiSnake.move();
+            }
         } else {
             timer.stop();
         }
