@@ -6,24 +6,19 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.Graphics2D;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import java.awt.AlphaComposite;
-import java.awt.image.BufferedImage;
+import javax.swing.JLabel;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -36,6 +31,8 @@ public class Board extends JPanel implements ActionListener {
     private static final int B_WIDTH = SQUARE_SIZE * 40;
     private static final int B_HEIGHT = SQUARE_SIZE * 40;
     private static final int DELAY = 100;
+
+    private static final int SCORE_HEIGHT = 32;
     
     private Fruit fruit;
     private int fruitX;
@@ -51,6 +48,7 @@ public class Board extends JPanel implements ActionListener {
     private Color aiSnakeColor;
     private AiSnakeController aiSnakeController;
     private boolean isAiPlaying = true;
+    private JLabel scoreLabel;
 
     public int getSquareSize(){
         return SQUARE_SIZE;
@@ -73,6 +71,10 @@ public class Board extends JPanel implements ActionListener {
 
         this.playerSnake = new Snake(3, new Point(5, 5), playerSnakeColor, Direction.RIGHT, this);
         this.aiSnake = new Snake(3, new Point(5, 20), aiSnakeColor, Direction.RIGHT, this);
+
+        setLayout(null);
+        setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT + SCORE_HEIGHT));
+        setBackground(color);
         initBoard();
     }
 
@@ -102,9 +104,7 @@ public class Board extends JPanel implements ActionListener {
     
     public void initBoard() {
         addKeyListener(new TAdapter());
-        setBackground(color);
         setFocusable(true);
-        setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
         initGame();
     }
@@ -134,8 +134,7 @@ public class Board extends JPanel implements ActionListener {
         if (timer != null) {
             timer.stop();
         }
-        
-        // Use stored colors when resetting
+
         setBackground(color);
         playerSnake.resetTo(3, new Point(5,5), playerSnakeColor);
         aiSnake.resetTo(3, new Point(5,20), aiSnakeColor);
@@ -149,11 +148,24 @@ public class Board extends JPanel implements ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        //drawGrid(g);
+        drawScoreArea(g); // Draw the score area at the top
         doDrawing(g);
         if(!inGame){
             gameOver(g);
         }
+    }
+
+    private void drawScoreArea(Graphics g) {
+        g.setColor(new Color(69, 69, 69));
+        g.fillRect(0, 0, B_WIDTH, SCORE_HEIGHT);
+
+        String scoreMsg = "Score: " + scoreKeeper.getCurrentScore();
+        Font small = new Font("Helvetica", Font.BOLD, 20);
+        FontMetrics metr = getFontMetrics(small);
+
+        g.setColor(Color.white);
+        g.setFont(small);
+        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, 24);
     }
 
     private void drawGrid(Graphics g) {
@@ -174,15 +186,25 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void doDrawing(Graphics g) {
-        g.drawImage(fruit.getImage(), fruitX, fruitY, this);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setClip(new Rectangle(0, SCORE_HEIGHT, B_WIDTH, B_HEIGHT));
+        g2d.translate(0, SCORE_HEIGHT); // Shift the game board down by SCORE_HEIGHT
 
-        playerSnake.doDrawing(g);
-        if(isAiPlaying) aiSnake.doDrawing(g);
+        // Clip the drawing area to exclude the score area
+
+        g2d.drawImage(fruit.getImage(), fruitX, fruitY, this);
+
+        playerSnake.doDrawing(g2d);
+        if (isAiPlaying) aiSnake.doDrawing(g2d);
+
+        g2d.dispose();
 
         Toolkit.getDefaultToolkit().sync();
     }
 
     private void gameOver(Graphics g) {
+        
+
         String msg = "Game Over";
         String scoreMsg = "Score: " + scoreKeeper.getCurrentScore();
         Font small = new Font("Helvetica", Font.BOLD, 20);
@@ -190,11 +212,11 @@ public class Board extends JPanel implements ActionListener {
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
-        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, B_HEIGHT / 2 + 30);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, (B_HEIGHT + SCORE_HEIGHT) / 2);
+        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, (B_HEIGHT + SCORE_HEIGHT) / 2 + 30);
 
         JButton mainMenuButton = new JButton("Return to Main Menu");
-        mainMenuButton.setBounds((B_WIDTH - 200) / 2, B_HEIGHT / 2 + 60, 200, 30);
+        mainMenuButton.setBounds((B_WIDTH - 200) / 2, (B_HEIGHT) / 2 + SCORE_HEIGHT + 60, 200, 30);
         mainMenuButton.addActionListener(e -> {
             scoreKeeper.saveScore();
             returnToMainMenu();

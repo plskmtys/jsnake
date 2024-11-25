@@ -28,8 +28,13 @@ public class ScoreKeeper {
     }
 
     public void saveScore() {
+        if(currentScore == 0) return;
         scores.add(currentScore);
         saveScores();
+    }
+
+    public int getBestScore() {
+        return scores.stream().max(Integer::compareTo).orElse(0);
     }
 
     public List<Integer> getScores() {
