@@ -76,7 +76,7 @@ public class SnakeGame extends JFrame {
             e -> System.exit(0)
         );
 
-        gameBoard = new Board(scoreKeeper, (Color) settings.getSettings().getOrDefault(Settings.BOARD_COLOR, Color.BLACK), (Color) settings.getSettings().getOrDefault(Settings.PLAYER_SNAKE_COLOR, Color.GREEN), (Color) settings.getSettings().getOrDefault(Settings.AI_SNAKE_COLOR, Color.RED));
+        gameBoard = new Board(scoreKeeper, (Color) settings.getSettings().getOrDefault(Settings.BOARD_COLOR, new Color(60, 63, 65)), (Color) settings.getSettings().getOrDefault(Settings.PLAYER_SNAKE_COLOR, Color.GREEN), (Color) settings.getSettings().getOrDefault(Settings.AI_SNAKE_COLOR, Color.RED));
         boardPanel = new BoardPanel(gameBoard);
         leaderBoard = new LeaderBoard(scoreKeeper);
         settingsPage = new SettingsPage(settings);
@@ -119,7 +119,7 @@ public class SnakeGame extends JFrame {
     private void applySettings() {
         Map<String, Object> currentSettings = settings.getSettings();
         
-        Color boardColor = (Color) currentSettings.getOrDefault(Settings.BOARD_COLOR, Color.BLACK);
+        Color boardColor = (Color) currentSettings.getOrDefault(Settings.BOARD_COLOR, new Color(60, 63, 65));
         Color playerColor = (Color) currentSettings.getOrDefault(Settings.PLAYER_SNAKE_COLOR, Color.GREEN);
         Color aiColor = (Color) currentSettings.getOrDefault(Settings.AI_SNAKE_COLOR, Color.RED);
         

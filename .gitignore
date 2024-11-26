@@ -1,5 +1,6 @@
 ### serialized files ###
 src/main/resources/scores.dat
+src/main/resources/settings.dat
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
