@@ -62,14 +62,14 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32)); // Updated title text size
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         add(titleLabel, gbc);
 
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         JLabel boardColorLabel = new JLabel("Board Color");
         boardColorLabel.setPreferredSize(new Dimension(320, 80));
-        boardColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        boardColorLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(boardColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("Board Color", boardColor, color -> {
@@ -82,7 +82,7 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 2;
         JLabel playerSnakeColorLabel = new JLabel("Player Snake Color");
         playerSnakeColorLabel.setPreferredSize(new Dimension(320, 80));
-        playerSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        playerSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(playerSnakeColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("Player Snake Color", playerSnakeColor, color -> {
@@ -95,7 +95,7 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 3;
         JLabel aiSnakeColorLabel = new JLabel("AI Snake Color");
         aiSnakeColorLabel.setPreferredSize(new Dimension(320, 80));
-        aiSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        aiSnakeColorLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(aiSnakeColorLabel, gbc);
         gbc.gridx = 1;
         add(createColorButton("AI Snake Color", aiSnakeColor, color -> {
@@ -108,7 +108,7 @@ public class SettingsPage extends JPanel {
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         JButton backButton = new JButton("Back to Main Menu");
-        backButton.setFont(new Font("Arial", Font.BOLD, 20)); // Updated other text size
+        backButton.setFont(new Font("Arial", Font.BOLD, 20));
         backButton.addActionListener(e -> returnToMainMenu());
         add(backButton, gbc);
     }

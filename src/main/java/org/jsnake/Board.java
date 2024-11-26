@@ -12,15 +12,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.JLabel;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 
 /**
  * A Board osztály felelős a játéktér megjelenítéséért és a játék logikájáért.
@@ -42,11 +37,6 @@ public class Board extends JPanel implements ActionListener {
     private static final int B_WIDTH = SQUARE_SIZE * 40;
     private static final int B_HEIGHT = SQUARE_SIZE * 40;
     private static final int DELAY = 100;
-
-    /**
-     * A pontszám megjelenítéséhez szükséges konstansok.
-     */
-    //private static final int SCORE_HEIGHT = 32;
     
     /**
      * A gyümölcs és pozíciója

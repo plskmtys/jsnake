@@ -39,7 +39,6 @@ public class BoardPanel extends JPanel {
         scoreLabel.setVerticalAlignment(SwingConstants.CENTER);
         scoreLabel.setOpaque(true);
         scoreLabel.setBorder(new javax.swing.border.MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-        //scoreLabel.setBackground(Color.LIGHT_GRAY);
 
         add(scoreLabel, BorderLayout.NORTH);
 
