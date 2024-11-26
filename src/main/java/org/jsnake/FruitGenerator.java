@@ -1,6 +1,16 @@
 package org.jsnake;
 
+/**
+ * Véletlenszerű gyümölcs generálásáért felelős osztály.
+ */
 public class FruitGenerator {
+
+    private FruitGenerator() {}
+
+    /**
+     * Véletlenszerű gyümölcs generálása.
+     * @return A generált gyümölcs.
+     */
     public static Fruit generateFruit() {
         double rand = Math.random();
         if(rand < Fruit.STRAWBERRY.getProbability()){

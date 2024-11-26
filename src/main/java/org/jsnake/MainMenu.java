@@ -9,8 +9,18 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.Font;
 
+/**
+ * A főmenüt megjelenítő panel.
+ */
 public class MainMenu extends JPanel {
 
+    /**
+     * A főmenü panel konstruktora.
+     * @param playAction A játék indításáért felelős ActionListener.
+     * @param leaderBoardAction A ranglista megjelenítéséért felelős ActionListener.
+     * @param settingsAction A beállítások megjelenítéséért felelős ActionListener.
+     * @param exitAction A kilépésért felelős ActionListener.
+     */
     public MainMenu(ActionListener playAction, ActionListener leaderBoardAction, ActionListener settingsAction, ActionListener exitAction) {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
