@@ -71,7 +71,7 @@ public class LeaderBoard extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        JLabel titleLabel = new JLabel("High Scores", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Leaderboard", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 25));
         add(titleLabel, BorderLayout.NORTH);
 
