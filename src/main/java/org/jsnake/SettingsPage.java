@@ -4,18 +4,44 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
+/**
+ * A SettingPage osztály felelős a játék beállításainak megjelenítéséért és kezeléséért.
+ */
 public class SettingsPage extends JPanel {
+    /**
+     * Ebben a változóban tároljuk a játék beállításait.
+     */
     private final Settings settings;
+
+    /**
+     * A tábla színe.
+     */
     private Color boardColor;
+
+    /**
+     * A játékos kígyójának színe.
+     */
     private Color playerSnakeColor;
+
+    /**
+     * Az AI kígyójának színe.
+     */
     private Color aiSnakeColor;
 
+    /**
+     * A SettingsPage osztály konstruktora.
+     *
+     * @param settings a játék beállításait tartalmazó objektum
+     */
     SettingsPage(Settings settings) {
         this.settings = settings;
         loadCurrentSettings();
         setupUI();
     }
 
+    /**
+     * Betölti a jelenlegi beállításokat.
+     */
     private void loadCurrentSettings() {
         Map<String, Object> currentSettings = settings.getSettings();
         boardColor = (Color) currentSettings.getOrDefault(Settings.BOARD_COLOR, Color.BLACK);
@@ -23,6 +49,9 @@ public class SettingsPage extends JPanel {
         aiSnakeColor = (Color) currentSettings.getOrDefault(Settings.AI_SNAKE_COLOR, Color.RED);
     }
 
+    /**
+     * Beállítja az ablak kinézetét.
+     */
     private void setupUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -84,6 +113,13 @@ public class SettingsPage extends JPanel {
         add(backButton, gbc);
     }
 
+    /**
+     * Létrehoz egy gombot, amely a szín kiválasztására szolgál.
+     * @param name a gomb neve
+     * @param initialColor az alapértelmezett szín
+     * @param listener a színváltozás eseménykezelője
+     * @return a gomb
+     */
     private JButton createColorButton(String name, Color initialColor, ColorChangeListener listener) {
         JButton button = new JButton() {
             @Override
@@ -105,6 +141,9 @@ public class SettingsPage extends JPanel {
         return button;
     }
 
+    /**
+     * Visszatér a főmenübe.
+     */
     private void returnToMainMenu() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         if (topFrame instanceof SnakeGame) {
@@ -112,6 +151,9 @@ public class SettingsPage extends JPanel {
         }
     }
 
+    /**
+     * Az interfész, amelyet a színváltozás eseménykezelői implementálnak.
+     */
     @FunctionalInterface
     interface ColorChangeListener {
         void onColorChanged(Color color);

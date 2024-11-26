@@ -2,13 +2,24 @@ package org.jsnake;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-
 import java.awt.Graphics2D;
 
+/**
+ * Ez az osztály a kígyó textúrájának létrehozására szolgál.
+ * Ez megengedi azt, hogy a kígyó különböző színekben jelenjen meg, de maradjanak rajta a részletek.
+ */
 public class TextureCreator {
-
+    /**
+     * A konstruktor privát, mert nem szükséges példányosítani az osztályt.
+     */
     private TextureCreator(){}
 
+    /**
+     * A metódus egy képet színez megadott színnel.
+     * @param source A színezendő kép.
+     * @param color A szín.
+     * @return A színezett kép.
+     */
     public static BufferedImage applyColorWithMultiply(BufferedImage source, Color color) {
         int width = source.getWidth();
         int height = source.getHeight();
@@ -40,6 +51,12 @@ public class TextureCreator {
         return result;
     }
 
+    /**
+     * A metódus két képet egymásra helyez.
+     * @param baseImage Az alsó kép.
+     * @param overlay A felső kép.
+     * @return Az egymásra helyezett kép.
+     */
     public static BufferedImage overlayImages(BufferedImage baseImage, BufferedImage overlay) {
         BufferedImage result = new BufferedImage(
             baseImage.getWidth(),
@@ -57,6 +74,13 @@ public class TextureCreator {
         return result;
     }
     
+    /**
+     * A metódus egy képet színez megadott színnel, majd ráhelyezi egy másik képet.
+     * @param base Az alsó kép.
+     * @param overlay A felső kép.
+     * @param fill A szín.
+     * @return Az egymásra helyezett és színezett kép.
+     */
     public static BufferedImage combine(BufferedImage base, BufferedImage overlay, Color fill) {
         return overlayImages(applyColorWithMultiply(base, fill), overlay);
     }

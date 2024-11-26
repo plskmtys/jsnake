@@ -3,20 +3,47 @@ package org.jsnake;
 import java.awt.Point;
 import java.util.*;
 
+/**
+ * Az AI kígyó vezérlője. A kígyó egy cél felé mozgatása a Dijkstra algoritmus segítségével.
+ * A kígyó a játékos kígyóját és a falakat elkerüli.
+ */
 public class AiSnakeController {
+    /**
+     * A kígyó, amelyet vezérel az AI.
+     */
     private Snake snake;
+
+    /**
+     * A játékos kígyója.
+     */
     private Snake playerSnake;
+
+    /**
+     * A cél, amely felé a kígyót mozgatni kell.
+     */
     private Point target;
 
+    /**
+     * Konstruktor.
+     * @param snake a kígyó, amelyet vezérel az AI
+     * @param playerSnake a játékos kígyója
+     */
     public AiSnakeController(Snake snake, Snake playerSnake) {
         this.snake = snake;
         this.playerSnake = playerSnake;
     }
 
+    /**
+     * Beállítja a célt, amely felé a kígyót mozgatni kell.
+     * @param target a cél
+     */
     public void setTarget(Point target) {
         this.target = target;
     }
 
+    /**
+     * A kígyót mozgatja a cél felé.
+     */
     public void moveTowardsTarget() {
         Point head = snake.getHeadPos();
         if (head.equals(target)) {
@@ -61,6 +88,11 @@ public class AiSnakeController {
         }
     }
 
+    /**
+     * Megvizsgálja, hogy a kígyó adott pozícióra tud-e lépni.
+     * @param pos a pozíció
+     * @return true, ha a kígyó léphet a pozícióra, egyébként false
+     */
     private boolean isValidMove(Point pos) {
         if (pos.x < 0 || pos.x >= snake.getBoard().getBoardWidth() ||
             pos.y < 0 || pos.y >= snake.getBoard().getBoardHeight()) {
@@ -82,6 +114,11 @@ public class AiSnakeController {
         return true;
     }
 
+    /**
+     * Beállítja a kígyó mozgási irányát a fej és a következő pozíció alapján.
+     * @param head a kígyó feje
+     * @param next a következő pozíció
+     */
     private void setDirection(Point head, Point next) {
         if (next.x < head.x) {
             snake.setDirection(Direction.LEFT);
@@ -94,11 +131,31 @@ public class AiSnakeController {
         }
     }
 
+    /**
+     * A Dijkstra algoritmusban használt Node objektum.
+     */
     private static class Node {
+        /**
+         * A Node pozíciója.
+         */
         Point position;
+        
+        /**
+         * A Node távolsága a kezdőponttól.
+         */
         int distance;
+
+        /**
+         * A Node előző Node-ja.
+         */
         Node previous;
 
+        /**
+         * Konstruktor.
+         * @param position a Node pozíciója
+         * @param distance a Node távolsága a kezdőponttól
+         * @param previous a Node előző Node-ja
+         */
         Node(Point position, int distance, Node previous) {
             this.position = position;
             this.distance = distance;

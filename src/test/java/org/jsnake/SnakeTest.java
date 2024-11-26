@@ -12,6 +12,7 @@ public class SnakeTest {
 
     @BeforeEach
     public void setUp() {
+
         board = new Board(new ScoreKeeper(), Color.BLACK, Color.GREEN, Color.RED);
         snake = new Snake(3, new Point(5, 5), Color.GREEN, Direction.RIGHT, board);
     }

@@ -8,15 +8,28 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * A játékban elért legmagasabb pontszámokat megjelenítő panel.
+ */
 public class LeaderBoard extends JPanel {
+    /**
+     * A pontszámokat tároló objektum.
+     */
     private ScoreKeeper scoreKeeper;
 
+    /**
+     * Konstruktor.
+     * @param scoreKeeper A pontszámokat tároló objektum.
+     */
     public LeaderBoard(ScoreKeeper scoreKeeper) {
         this.scoreKeeper = scoreKeeper;
         setLayout(new BorderLayout());
         updateLeaderboard();
     }
 
+    /**
+     * Frissíti a ranglistát.
+     */
     public void updateLeaderboard() {
         removeAll();
 
@@ -71,6 +84,9 @@ public class LeaderBoard extends JPanel {
         repaint();
     }
 
+    /**
+     * Visszatér a főmenübe.
+     */
     private void returnToMainMenu() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         if (topFrame instanceof SnakeGame) {
