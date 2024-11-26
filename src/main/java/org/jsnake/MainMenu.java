@@ -8,11 +8,18 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 
 /**
  * A főmenüt megjelenítő panel.
  */
 public class MainMenu extends JPanel {
+    /**
+     * A menü háttérképe.
+     */
+    private Image backgroundImage;
 
     /**
      * A főmenü panel konstruktora.
@@ -22,6 +29,8 @@ public class MainMenu extends JPanel {
      * @param exitAction A kilépésért felelős ActionListener.
      */
     public MainMenu(ActionListener playAction, ActionListener leaderBoardAction, ActionListener settingsAction, ActionListener exitAction) {
+        backgroundImage = new ImageIcon("src/main/resources/titlescreen.png").getImage();
+        
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -65,5 +74,16 @@ public class MainMenu extends JPanel {
         exitButton.setPreferredSize(new Dimension(200, 50));
         exitButton.addActionListener(exitAction);
         add(exitButton, gbc);
+    }
+
+    /**
+     * A háttérkép kirajzolásáért felelős metódus.
+     * @param g A kirajzolásért felelős Graphics objektum.
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Draw the background image
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
 }
